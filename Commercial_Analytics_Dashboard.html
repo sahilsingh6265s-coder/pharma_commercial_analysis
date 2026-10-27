@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>US Pharma Commercial Analytics Suite — Glucotrol Advance</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root{
+    --navy:#0B2545;
+    --navy-2:#13315C;
+    --slate:#3A4A63;
+    --bg:#F6F8FB;
+    --card:#FFFFFF;
+    --line:#E2E8F0;
+    --teal:#0E7C7B;
+    --amber:#C9862B;
+    --coral:#C2452D;
+    --ink:#101828;
+    --muted:#5B6B82;
+    --champion:#0E7C7B;
+    --growth:#2E6F9E;
+    --maintain:#C9862B;
+    --lowpri:#9AA5B5;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"IBM Plex Sans",Arial,sans-serif;
+  }
+  .topbar{
+    background:linear-gradient(135deg,var(--navy) 0%,var(--navy-2) 100%);
+    color:#fff; padding:22px 32px; display:flex; justify-content:space-between; align-items:flex-end;
+  }
+  .topbar h1{margin:0; font-size:20px; font-weight:700; letter-spacing:0.2px;}
+  .topbar .sub{color:#B9C6DC; font-size:12.5px; margin-top:4px;}
+  .topbar .meta{text-align:right; font-size:11px; color:#B9C6DC; line-height:1.6;}
+  .tabs{
+    display:flex; gap:2px; background:var(--navy-2); padding:0 32px;
+  }
+  .tab{
+    padding:12px 18px; color:#C7D3E6; font-size:13px; font-weight:600; cursor:pointer;
+    border-bottom:3px solid transparent; user-select:none;
+  }
+  .tab.active{color:#fff; border-bottom:3px solid var(--teal); background:rgba(255,255,255,0.04);}
+  .wrap{padding:24px 32px 48px;}
+  .panel{display:none;}
+  .panel.active{display:block; animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);}}
+  .kpis{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:20px;}
+  .kpi{
+    background:var(--card); border:1px solid var(--line); border-radius:6px; padding:16px 18px;
+    border-left:4px solid var(--teal);
+  }
+  .kpi .label{font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:var(--muted); font-weight:600;}
+  .kpi .value{font-family:"IBM Plex Mono",monospace; font-size:24px; font-weight:600; color:var(--ink); margin-top:4px;}
+  .kpi .foot{font-size:11.5px; color:var(--muted); margin-top:3px;}
+  .grid2{display:grid; grid-template-columns:1.1fr 0.9fr; gap:16px;}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:6px; padding:18px 20px;}
+  .card h3{margin:0 0 4px; font-size:14px; color:var(--navy);}
+  .card .desc{font-size:12px; color:var(--muted); margin-bottom:14px;}
+  table{width:100%; border-collapse:collapse; font-size:12.5px;}
+  th{
+    text-align:left; padding:8px 10px; background:#F0F3F8; color:var(--slate);
+    font-size:11px; text-transform:uppercase; letter-spacing:.4px; border-bottom:1px solid var(--line);
+  }
+  td{padding:8px 10px; border-bottom:1px solid #EEF1F5; font-family:"IBM Plex Mono",monospace; font-size:12px;}
+  td.label-cell{font-family:"IBM Plex Sans",sans-serif; font-weight:600;}
+  .tag{display:inline-block; padding:2px 8px; border-radius:10px; font-size:10.5px; font-weight:600; color:#fff;}
+  .tag.champion{background:var(--champion);}
+  .tag.growth{background:var(--growth);}
+  .tag.maintain{background:var(--maintain);}
+  .tag.lowpri{background:var(--lowpri);}
+  .tag.flag-under{background:var(--coral);}
+  .tag.flag-over{background:var(--teal);}
+  .tag.flag-normal{background:#CBD5E1; color:#334155;}
+  .insight{
+    background:#EFF7F6; border-left:3px solid var(--teal); padding:10px 14px; font-size:12.5px;
+    color:#0B3B3A; border-radius:4px; margin-top:14px;
+  }
+  .footer-note{font-size:11px; color:var(--muted); margin-top:28px; border-top:1px solid var(--line); padding-top:12px;}
+  canvas{max-height:280px;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <h1>US Pharma Commercial Analytics Suite</h1>
+    <div class="sub">HCP Targeting · Call Planning · Incentive Compensation · Marketing Mix — Glucotrol Advance (Type 2 Diabetes)</div>
+  </div>
+  <div class="meta">
+    Data: CMS Part D Prescriber schema (synthetic, 5,045 HCPs · 39 territories)<br>
+    Prepared for: Commercial Operations Review · Q3 2026
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" data-tab="overview">Overview</div>
+  <div class="tab" data-tab="segmentation">1 · HCP Segmentation</div>
+  <div class="tab" data-tab="callplan">2 · Call Plan</div>
+  <div class="tab" data-tab="ic">3 · Incentive Comp</div>
+  <div class="tab" data-tab="mix">4 · Marketing Mix</div>
+</div>
+
+<div class="wrap">
+
+  <!-- OVERVIEW -->
+  <div class="panel active" id="overview">
+    <div class="kpis">
+      <div class="kpi"><div class="label">Prescribers Analyzed</div><div class="value">5,045</div><div class="foot">Across 6 specialties, 50 states</div></div>
+      <div class="kpi"><div class="label">Sales Territories</div><div class="value">39</div><div class="foot">~130 HCPs / rep book</div></div>
+      <div class="kpi"><div class="label">Champion-Tier Coverage</div><div class="value">100%</div><div class="foot">Protected even under tight capacity</div></div>
+      <div class="kpi"><div class="label">Qtrly Bonus Payout (sim.)</div><div class="value">$360.8K</div><div class="foot">Across 39 reps, IC model</div></div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h3>What this suite does</h3>
+        <div class="desc">One connected pipeline — not four disconnected exercises</div>
+        <p style="font-size:13px; line-height:1.7; color:var(--ink);">
+        Built on prescriber-level Rx data (CMS Part D schema): HCPs are <b>segmented</b> into four tiers by volume and brand loyalty →
+        segments drive a capacity-constrained <b>call plan</b> that protects top-tier coverage first →
+        actual call plan output feeds a fairness-audited <b>incentive compensation</b> model →
+        call activity plus simulated marketing exposure feeds a <b>channel-effectiveness regression</b>
+        to guide next quarter's non-personal promotion budget.
+        </p>
+      </div>
+      <div class="card">
+        <h3>Headline findings</h3>
+        <div class="desc">What a client review would lead with</div>
+        <table>
+          <tr><td class="label-cell">Segmentation</td><td>0.4% of HCPs (Champions) drive 11.9% of brand volume; Growth tier (36.9%) drives 81.7%</td></tr>
+          <tr><td class="label-cell">Call Plan</td><td>At 200 calls/rep/qtr, Maintain-tier coverage drops to 89.6% — Champion/Growth stay at 100%</td></tr>
+          <tr><td class="label-cell">Incentive Comp</td><td>Territory-attainment correlation of 0.22 — quotas are reasonably difficulty-adjusted; 5 reps flagged</td></tr>
+          <tr><td class="label-cell">Marketing Mix</td><td>Email &amp; Congress outperform Digital Ads on standardized lift; suggests reallocating ~33pp of budget</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEGMENTATION -->
+  <div class="panel" id="segmentation">
+    <div class="kpis">
+      <div class="kpi"><div class="label">Champion HCPs</div><div class="value">22</div><div class="foot">0.4% of base, 11.9% of our-brand volume</div></div>
+      <div class="kpi"><div class="label">Growth HCPs</div><div class="value">1,862</div><div class="foot">36.9% of base, 81.7% of our-brand volume</div></div>
+      <div class="kpi"><div class="label">Maintain HCPs</div><div class="value">2,038</div><div class="foot">40.4% of base, 6.3% of volume</div></div>
+      <div class="kpi"><div class="label">Low-Priority HCPs</div><div class="value">1,123</div><div class="foot">22.3% of base, 0.2% of volume</div></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><h3>Tier size vs. brand-volume contribution</h3><div class="desc">K-means on volume, our-brand share, brand-mix % · 4 clusters</div><canvas id="segChart"></canvas></div>
+      <div class="card">
+        <h3>Segment definitions</h3>
+        <div class="desc">Business-readable labels mapped from cluster ranking</div>
+        <table>
+          <tr><th>Tier</th><th>Avg. Total Claims</th><th># HCPs</th></tr>
+          <tr><td><span class="tag champion">Champion</span></td><td>670.8</td><td>22</td></tr>
+          <tr><td><span class="tag growth">Growth</span></td><td>38.6</td><td>1,862</td></tr>
+          <tr><td><span class="tag maintain">Maintain</span></td><td>23.3</td><td>2,038</td></tr>
+          <tr><td><span class="tag lowpri">Low-Priority</span></td><td>17.0</td><td>1,123</td></tr>
+        </table>
+        <div class="insight">Insight: targeting should concentrate on Champion + Growth (37.3% of HCPs, 93.6% of our-brand volume) — the classic Pareto pattern real pharma commercial teams plan around.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALL PLAN -->
+  <div class="panel" id="callplan">
+    <div class="kpis">
+      <div class="kpi"><div class="label">Rep Capacity</div><div class="value">200</div><div class="foot">Calls / rep / quarter (tight, intentional constraint)</div></div>
+      <div class="kpi"><div class="label">Avg Utilization</div><div class="value">96.7%</div><div class="foot">Across 39 reps</div></div>
+      <div class="kpi"><div class="label">Champion Coverage</div><div class="value">100%</div><div class="foot">Never sacrificed under constraint</div></div>
+      <div class="kpi"><div class="label">Maintain Coverage</div><div class="value">89.6%</div><div class="foot">The tier that absorbs the capacity shortfall</div></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><h3>Target vs. allocated calls by tier</h3><div class="desc">Greedy priority allocation: Champion → Growth → Maintain → Low-Priority</div><canvas id="callChart"></canvas></div>
+      <div class="card">
+        <h3>How the allocation logic works</h3>
+        <div class="desc">Priority-ranked, capacity-constrained</div>
+        <p style="font-size:12.5px; line-height:1.7; color:var(--ink);">
+        Each of the 39 reps is assigned ~130 HCPs by territory. Target visit frequency is set by tier
+        (Champion = 6/qtr, Growth = 3/qtr, Maintain = 1/qtr, Low-Priority = 0). Within a rep's fixed
+        200-call capacity, HCPs are served in tier-priority order, so a capacity-constrained rep
+        under-serves Maintain-tier HCPs before ever touching a Champion or Growth account.
+        </p>
+        <div class="insight">Insight: the plan is capacity-honest — it shows exactly where coverage breaks first, which is the deliverable a client actually needs (not a plan that pretends unlimited rep time exists).</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IC -->
+  <div class="panel" id="ic">
+    <div class="kpis">
+      <div class="kpi"><div class="label">Reps Modeled</div><div class="value">39</div><div class="foot">Quota = territory potential × 12% growth target</div></div>
+      <div class="kpi"><div class="label">Total Qtrly Payout</div><div class="value">$360.8K</div><div class="foot">Simulated, threshold/target/excellence curve</div></div>
+      <div class="kpi"><div class="label">Potential–Attainment Corr.</div><div class="value">0.22</div><div class="foot">Near 0 = quotas well difficulty-adjusted</div></div>
+      <div class="kpi"><div class="label">Reps Flagged</div><div class="value">5</div><div class="foot">3 over-, 2 under-incentivized</div></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><h3>Payout curve applied</h3><div class="desc">Threshold 90% · Target 100% · Excellence cap at 120%+ attainment</div><canvas id="icChart"></canvas></div>
+      <div class="card">
+        <h3>Fairness flags</h3>
+        <div class="desc">Comparing territory potential to attainment</div>
+        <table>
+          <tr><th>Flag</th><th># Reps</th></tr>
+          <tr><td><span class="tag flag-normal">Normal</span></td><td>34</td></tr>
+          <tr><td><span class="tag flag-over">High performer (hard territory)</span></td><td>3</td></tr>
+          <tr><td><span class="tag flag-under">Underperforming (easy territory)</span></td><td>2</td></tr>
+        </table>
+        <div class="insight">Insight: a 0.22 correlation is close enough to zero that the quota model isn't systematically favoring big territories — but the 5 flagged reps are worth a 1:1 review before next cycle's plan design.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MARKETING MIX -->
+  <div class="panel" id="mix">
+    <div class="kpis">
+      <div class="kpi"><div class="label">Model R²</div><div class="value">0.42</div><div class="foot">Variance in Rx-lift explained by 4 channels</div></div>
+      <div class="kpi"><div class="label">Top Channel</div><div class="value">Email</div><div class="foot">Std. coefficient 3.18</div></div>
+      <div class="kpi"><div class="label">Weakest Channel</div><div class="value">Digital Ads</div><div class="foot">Std. coefficient 0.28</div></div>
+      <div class="kpi"><div class="label">Suggested Reallocation</div><div class="value">~33pp</div><div class="foot">Away from digital, toward email/congress</div></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><h3>Channel effectiveness (standardized)</h3><div class="desc">Multiple regression on Rx-lift: calls + email + digital + congress</div><canvas id="mixChart"></canvas></div>
+      <div class="card">
+        <h3>Suggested budget allocation</h3>
+        <div class="desc">Proportional to standardized coefficient</div>
+        <table>
+          <tr><th>Channel</th><th>Suggested Share</th></tr>
+          <tr><td class="label-cell">Email</td><td>36.1%</td></tr>
+          <tr><td class="label-cell">Congress / Conference</td><td>36.0%</td></tr>
+          <tr><td class="label-cell">Rep Calls</td><td>24.7%</td></tr>
+          <tr><td class="label-cell">Digital Ads</td><td>3.2%</td></tr>
+        </table>
+        <div class="insight">Insight: digital display advertising shows diminishing returns (log-scaled impressions) and the smallest marginal effect — a strong candidate to trim in favor of email and congress presence.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    Methodology: synthetic dataset built to the real CMS Medicare Part D Prescribers-by-Provider-and-Drug schema (NPI, specialty, state, drug, claims, cost) so the pipeline runs unchanged against the real file.
+    Segmentation: K-means (scikit-learn). Call plan: capacity-constrained greedy allocation (Python). Incentive comp: quota = potential × growth target,
+    3-tier payout curve (Python + Excel model with live formulas). Marketing mix: standardized multiple linear regression (scikit-learn).
+  </div>
+
+</div>
+
+<script>
+const tabs = document.querySelectorAll('.tab');
+const panels = document.querySelectorAll('.panel');
+tabs.forEach(t => t.addEventListener('click', () => {
+  tabs.forEach(x=>x.classList.remove('active'));
+  panels.forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  document.getElementById(t.dataset.tab).classList.add('active');
+}));
+
+const fontFamily = "IBM Plex Sans, Arial, sans-serif";
+Chart.defaults.font.family = fontFamily;
+Chart.defaults.color = "#5B6B82";
+
+new Chart(document.getElementById('segChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Champion','Growth','Maintain','Low-Priority'],
+    datasets: [
+      {label:'% of HCPs', data:[0.4,36.9,40.4,22.3], backgroundColor:'#2E6F9E', yAxisID:'y'},
+      {label:'% of Brand Volume', data:[11.9,81.7,6.3,0.2], backgroundColor:'#0E7C7B', yAxisID:'y'}
+    ]
+  },
+  options: { responsive:true, plugins:{legend:{position:'bottom', labels:{boxWidth:12,font:{size:11}}}},
+    scales:{ y:{ title:{display:true,text:'%'}, grid:{color:'#EEF1F5'} }, x:{grid:{display:false}} } }
+});
+
+new Chart(document.getElementById('callChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Champion','Growth','Maintain','Low-Priority'],
+    datasets: [
+      {label:'Target calls/qtr', data:[6.0,3.0,1.0,0.0], backgroundColor:'#C9862B'},
+      {label:'Allocated calls/qtr', data:[6.0,3.0,0.9,0.0], backgroundColor:'#0E7C7B'}
+    ]
+  },
+  options: { responsive:true, plugins:{legend:{position:'bottom', labels:{boxWidth:12,font:{size:11}}}},
+    scales:{ y:{ title:{display:true,text:'Calls / quarter'}, grid:{color:'#EEF1F5'} }, x:{grid:{display:false}} } }
+});
+
+new Chart(document.getElementById('icChart'), {
+  type: 'line',
+  data: {
+    labels: ['80%','90%','100%','110%','120%','130%'],
+    datasets: [{
+      label:'Payout % of target bonus', data:[0,50,75,100,125,125],
+      borderColor:'#0E7C7B', backgroundColor:'rgba(14,124,123,0.12)', fill:true, tension:0.25, pointRadius:4
+    }]
+  },
+  options: { responsive:true, plugins:{legend:{display:false}},
+    scales:{ y:{ title:{display:true,text:'Payout % of target bonus'}, grid:{color:'#EEF1F5'} },
+             x:{ title:{display:true,text:'Attainment %'}, grid:{display:false} } } }
+});
+
+new Chart(document.getElementById('mixChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Email','Congress/Conference','Rep Calls','Digital Ads'],
+    datasets: [{ label:'Standardized coefficient', data:[3.18,3.17,2.17,0.28],
+      backgroundColor:['#0E7C7B','#2E6F9E','#C9862B','#9AA5B5'] }]
+  },
+  options: { indexAxis:'y', responsive:true, plugins:{legend:{display:false}},
+    scales:{ x:{ title:{display:true,text:'Standardized coefficient (relative impact on Rx lift)'}, grid:{color:'#EEF1F5'} },
+             y:{grid:{display:false}} } }
+});
+</script>
+
+</body>
+</html>
